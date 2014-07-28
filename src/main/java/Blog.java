@@ -8,13 +8,18 @@
 import java.util.Date;
 import java.util.UUID;
 
+import net.vz.mongodb.jackson.ObjectId;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 
 public class Blog {
 
+
+
     @net.vz.mongodb.jackson.Id
-    private String id = UUID.randomUUID().toString();
+    @ObjectId
+    private String id;
+    private long blogId;
 
     @NotBlank
     private String title;
@@ -48,5 +53,21 @@ public class Blog {
 
     public Date getPublishedOn() {
         return publishedOn;
+    }
+
+    public boolean isValid() {
+        return title != null && url != null;
+    }
+
+    public long getBlogId() {
+        return blogId;
+    }
+
+    public void setBlogId(long blogId) {
+        this.blogId = blogId;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

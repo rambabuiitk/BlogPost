@@ -5,15 +5,12 @@
  * Time: 9:20 PM
  * To change this template use File | Settings | File Templates.
  */
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -21,6 +18,7 @@ import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 
 import com.yammer.metrics.annotation.Timed;
+import net.vz.mongodb.jackson.WriteResult;
 
 @Path("/blogs")
 @Produces(value = MediaType.APPLICATION_JSON)
@@ -36,7 +34,66 @@ public class BlogResource {
     @POST
     @Timed
     public Response publishNewBlog(@Valid Blog blog) {
-        collection.insert(blog);
-        return Response.noContent().build();
+        WriteResult<Blog, String> result = null;
+        if(blog != null && blog.isValid())  {
+            if(blog.getId() != null) {
+                result = collection.updateById(blog.getId(), blog);
+                if(result == null) {
+                    return Response.serverError().build();
+                }
+            }else {
+                result = collection.insert(blog);
+                if(result == null) {
+                    return Response.serverError().build();
+                }
+
+                blog.setId(result.getSavedId());
+            }
+        }
+
+        return Response.created(URI.create(blog.getId())).entity(blog).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Timed
+    public Blog getBlog(@PathParam("id") String id) {
+        Blog b = collection.findOneById(id);
+        if (b != null) {
+            return b;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+
+    @GET
+    @Timed
+    public List<Blog> listBlogs() {
+        DBCursor<Blog> dbCursor = collection.find();
+        List<Blog> blogs = new ArrayList<Blog>();
+        while (dbCursor.hasNext()) {
+            Blog blog = dbCursor.next();
+            blogs.add(blog);
+        }
+
+        return blogs;
+    }
+
+
+
+    @DELETE
+    @Path("/{id}")
+    @Timed
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    public void deleteBlog(@PathParam("id") String id) {
+        /**
+         * Note: AngularJS $resource will send a DELETE request as content-type test/plain for some reason;
+         * so therefore we must add MediaType.TEXT_PLAIN here.
+         */
+        if (collection.findOneById(id) != null) {
+            collection.removeById(id);
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
 }

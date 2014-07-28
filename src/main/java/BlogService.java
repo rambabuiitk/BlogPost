@@ -8,6 +8,7 @@
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import net.vz.mongodb.jackson.JacksonDBCollection;
@@ -15,12 +16,14 @@ import net.vz.mongodb.jackson.JacksonDBCollection;
 public class BlogService extends Service<BlogConfiguration> {
 
     public static void main(String[] args) throws Exception {
-        new BlogService().run(new String[] { "server" });
+        new BlogService().run(args);
     }
 
     @Override
     public void initialize(Bootstrap<BlogConfiguration> bootstrap) {
         bootstrap.setName("blog");
+        AssetsBundle bundle = new AssetsBundle("/html", "");
+        bootstrap.addBundle(bundle);
     }
 
     @Override
