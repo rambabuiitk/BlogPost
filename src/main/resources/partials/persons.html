@@ -1,0 +1,63 @@
+<h2>Simple CRUD app using RESTful backend services</h2>
+
+<p>
+    <b>Note:</b> <i>For this example to run, make sure that the backend services in the <code>dw-server</code> have been
+    started. See the README file in that module for how to do that.</i>
+</p>
+
+<div ng-controller="BlogsCtrl">
+
+    <div class="control-group">
+        <input class="span4" type="text" ng-model="searchText.$" placeholder="Filter the list..">
+        <!--
+         The following defines two buttons used for either hiding or showing the person form. The personForn.show
+         variable in the PersonCtrl determines which button is displayed.
+        -->
+        <button ng-show="!blogForm.show" class="span3 btn" style="margin-left: 0; margin-right: 4px" type="button"
+                ng-click="toggleBlogForm()">Show Blog form</button>
+        <button ng-show="blogForm.show" class="span3 btn" style="margin-left: 0; margin-right: 4px" type="button"
+                ng-click="toggleBlogForm()">Hide Blog form</button>
+    </div>
+
+    <div ng-show="blogForm.show">
+        <form class="form-inline" ng-submit="saveBlog(blogForm.blog)">
+            <input type="text" class="span3" placeholder="Title" ng-model="blogForm.blog.title">
+            <input type="text" class="span4" placeholder="Url" ng-model="blogForm.blog.url">
+            <input type="text" class="span2" placeholder="Published On" ng-model="blogForm.blog.publishedOn">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <!--
+             Note that the clear-button here must have the type attribute set to 'button' otherwise it will
+             by default get type=submit. See:
+             http://stackoverflow.com/questions/12319758/angularjs-clicking-a-button-within-a-form-causes-page-refresh
+            -->
+            <button type="button" class="btn" ng-click="clearForm()">Clear form</button>
+        </form>
+    </div>
+
+    <h3>List of Blogs</h3>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th style="width: 100px">Operation</th>
+            <th style="width: 20px">Id</th>
+            <th>Title</th>
+            <th>Url</th>
+            <th>PublishedOn</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="b in blogs | orderBy:'title' | filter:searchText">
+            <td style="width: 100px">
+                <button class="btn" ng-click="editBlog(p)"><i class="icon-edit"></i></button>
+                <button class="btn" ng-click="deleteBlog(p)"><i class="icon-trash"></i></button>
+            </td>
+            <td style="width: 20px">{{b.id}}</td>
+            <td>{{b.title}}</td>
+            <td>{{b.url}}</td>
+            <td>{{b.publishedOn}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

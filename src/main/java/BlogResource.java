@@ -32,6 +32,7 @@ public class BlogResource {
     }
 
     @POST
+    @Path("/blogs/{id}")
     @Timed
     public Response publishNewBlog(@Valid Blog blog) {
         WriteResult<Blog, String> result = null;
@@ -55,7 +56,7 @@ public class BlogResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/blogs/{id}")
     @Timed
     public Blog getBlog(@PathParam("id") String id) {
         Blog b = collection.findOneById(id);
@@ -67,6 +68,7 @@ public class BlogResource {
     }
 
     @GET
+    @Path("/blogs")
     @Timed
     public List<Blog> listBlogs() {
         DBCursor<Blog> dbCursor = collection.find();
@@ -82,7 +84,7 @@ public class BlogResource {
 
 
     @DELETE
-    @Path("/{id}")
+    @Path("/blogs/{id}")
     @Timed
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public void deleteBlog(@PathParam("id") String id) {
